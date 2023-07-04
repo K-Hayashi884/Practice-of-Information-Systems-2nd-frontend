@@ -10,100 +10,75 @@ class IndexPage extends StatelessWidget {
     final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("Youtube.txt")),
-      body: Center(
-        child: Expanded(
-          child: SingleChildScrollView(
-            child: Column(children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: SizedBox(
-                    width: deviceWidth * 0.8,
-                    child: Center(
-                        child: video.image != null
-                            ? video.image!
-                            : Image.asset("images/dummy_thumbnail.png"))),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: SizedBox(
-                  width: deviceWidth * 0.8,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(video.title),
-                      OutlinedButton(
-                          onPressed: () {}, child: const Text("あとで見る")),
-                    ],
-                  ),
-                ),
-              ),
-              video.indices != null
-                  ? SizedBox(
-                      width: deviceWidth * 0.9,
-                      height: deviceHeight * 0.3,
-                      child: SingleChildScrollView(
-                        child: ListView.builder(
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: video.indices!.length,
-                            itemBuilder: (context, index) {
-                              return Row(children: [
-                                SizedBox(
-                                  width: deviceWidth * 0.3,
-                                  child: TextButton(
-                                    onPressed: () {},
-                                    child: Text(
-                                        video.indices![index]["timestamp"]!),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: deviceWidth * 0.6,
-                                  child:
-                                      Text(video.indices![index]["headline"]!),
-                                )
-                              ]);
-                            }),
-                      ),
-                    )
-                  : const SizedBox(),
-              video.comments != null
-                  ? Expanded(
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: SizedBox(
-                                width: deviceWidth * 0.85,
-                                child: const Text("コメントからのおすすめ")),
-                          ),
-                          SizedBox(
-                            width: deviceWidth * 0.9,
-                            height: deviceHeight * 0.3,
-                            child: ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: video.comments!.length,
-                                itemBuilder: (context, index) {
-                                  return SizedBox(
-                                    width: deviceWidth * 0.9,
-                                    child: Text(
-                                      video.comments![index],
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  );
-                                }),
-                          ),
-                        ],
-                      ),
-                    )
-                  : const SizedBox(),
-            ]),
+    final List<Widget> thumbnailItems = [
+      Padding(
+        padding: const EdgeInsets.only(top: 16.0),
+        child: SizedBox(
+            width: deviceWidth * 0.8,
+            child: Center(
+                child: video.image != null
+                    ? video.image!
+                    : Image.asset("images/dummy_thumbnail.png"))),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: SizedBox(
+          width: deviceWidth * 0.8,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(video.title),
+              OutlinedButton(onPressed: () {}, child: const Text("あとで見る")),
+            ],
           ),
         ),
+      ),
+    ];
+    final List<Widget> indicesList = [];
+    if (video.indices != null) {
+      for (Map<String, String> indice in video.indices!) {
+        indicesList.add(Row(children: [
+          SizedBox(
+            width: deviceWidth * 0.3,
+            child: TextButton(
+              onPressed: () {},
+              child: Text(indice["timestamp"]!),
+            ),
+          ),
+          SizedBox(
+            width: deviceWidth * 0.6,
+            child: Text(indice["headline"]!),
+          )
+        ]));
+      }
+    }
+    final List<Widget> commentsList = [];
+    if (video.comments != null) {
+      commentsList.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: SizedBox(
+              width: deviceWidth * 0.85, child: const Text("コメントからのおすすめ")),
+        ),
+      );
+      for (String comment in video.comments!) {
+        commentsList.add(SizedBox(
+          width: deviceWidth * 0.9,
+          child: Text(
+            comment,
+            textAlign: TextAlign.start,
+          ),
+        ));
+      }
+    }
+    return Scaffold(
+      appBar: AppBar(title: const Text("Youtube.txt")),
+      body: CustomScrollView(
+        slivers: [
+          SliverList(delegate: SliverChildListDelegate(thumbnailItems)),
+          SliverList(delegate: SliverChildListDelegate(indicesList)),
+          SliverList(delegate: SliverChildListDelegate(commentsList))
+        ],
       ),
     );
   }
