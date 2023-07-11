@@ -1,4 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+
+
+const storage = FlutterSecureStorage();
 
 class UserPage extends StatelessWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -77,7 +84,7 @@ class LoginPage extends StatelessWidget{
             onPressed: (){
               String username = loginUsernameFromui.text;
               String password = loginPasswordFromui.text;
-              print(username+password);//loginのための関数
+              login(username,password);//loginのための関数
             },
             child: const Text('Login')
           )
@@ -86,6 +93,28 @@ class LoginPage extends StatelessWidget{
     );
   }
 }
+
+Future<void> login(String username, String password) async {
+  var url = Uri.parse('http:/localhost/api/login/');  //ログインエンドポイントのURLを入れる
+  var headers = {"Content-Type": "application/json"};
+  var body = json.encode({"username": username, "password": password});
+
+  var response = await http.post(url, headers: headers, body: body);
+
+  if (response.statusCode == 200) {
+    // ログイン成功時の処理
+    var responseData = json.decode(response.body);
+    await storage.write(key: "accessToken", value: responseData['access_token']);  //あとでログイン時に参照できるようにする？？
+
+  } else {
+    // ログインエラー時の処理
+    throw Exception('ログインエラー');
+  }
+}
+
+
+
+
 
 class SignupPage extends StatelessWidget{
   const SignupPage({super.key});
