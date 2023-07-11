@@ -56,7 +56,10 @@ class IndexPage extends StatelessWidget {
           ),
           SizedBox(
             width: deviceWidth * 0.6,
-            child: Text(indice["headline"]!),
+            child: Text(
+              indice["headline"]!,
+              overflow: TextOverflow.ellipsis,
+            ),
           )
         ]));
       }
