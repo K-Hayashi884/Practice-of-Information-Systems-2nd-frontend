@@ -28,8 +28,8 @@ class UserPage extends StatelessWidget {
               ],
             ),
           ),
-          body: const Padding(
-            padding: EdgeInsets.symmetric(vertical: 120, horizontal: 50),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 120, horizontal: 50),
             child: TabBarView(
               children: [
                 LoginPage(),
@@ -44,45 +44,44 @@ class UserPage extends StatelessWidget {
 }
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  LoginPage({Key? key}) : super(key: key);
+
+  final TextEditingController loginUsernameFromui = TextEditingController();
+  final TextEditingController loginPasswordFromui = TextEditingController();
+
+  void _login(BuildContext context) async {
+    try {
+      // トークンを取得・保存
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final AuthService _authService = AuthService();
+      final token = await _authService.login(
+        loginUsernameFromui.text,
+        loginPasswordFromui.text,
+        context,
+      );
+      authProvider.setToken(token);
+    } catch (e) {
+      print(e);
+      showDialog(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return AlertDialog(
+            title: Text('Login Failed'),
+            content: Text('Invalid username or password.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () => Navigator.of(dialogContext).pop(),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final loginUsernameFromui = TextEditingController();
-    final loginPasswordFromui = TextEditingController();
-
-    final AuthService _authService = AuthService();
-
-    void _login(BuildContext context) async {
-      try {
-        // トークンを取得・保存
-        final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        final token = await _authService.login(
-          loginUsernameFromui.text,
-          loginPasswordFromui.text,
-          context,
-        );
-        authProvider.setToken(token);
-      } catch (e) {
-        print(e);
-        showDialog(
-          context: context,
-          builder: (BuildContext dialogContext) {
-            return AlertDialog(
-              title: Text('Login Failed'),
-              content: Text('Invalid username or password.'),
-              actions: [
-                TextButton(
-                  child: Text('OK'),
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
-
     return Column(children: [
       Container(
         alignment: Alignment.centerLeft,
@@ -103,16 +102,18 @@ class LoginPage extends StatelessWidget {
           obscureText: true),
       const SizedBox(height: 20),
       SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-              onPressed: () {
-                _login(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const TopPage()),
-                );
-              },
-              child: const Text('Login')))
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: () {
+            _login(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const TopPage()),
+            );
+          },
+          child: const Text('Login'),
+        ),
+      ),
     ]);
   }
 }

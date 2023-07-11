@@ -6,8 +6,7 @@ import 'auth_provider.dart';
 
 class IndexPage extends StatelessWidget {
   final AuthService _authService = AuthService();
-
-  // const IndexPage({super.key});
+  IndexPage({Key? key}) : super(key: key);
   Future<void> fetchProtectedPage(BuildContext context) async {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
