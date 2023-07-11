@@ -7,11 +7,44 @@ import 'package:http/http.dart' as http;
 
 const storage = FlutterSecureStorage();
 
-class UserPage extends StatelessWidget {
+class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context){
+  _UserPageState createState() => _UserPageState();
+}
+
+class _UserPageState extends State<UserPage>{
+  @override
+  void initState(){
+    super.initState();
+    initialize();
+  }
+
+  Future<void> initialize() async{
+    String? accessToken = await storage.read(key: "accessToken");
+    if(accessToken != null){
+      var url = Uri.parse('http:/localhost/api/login/');  //ログインエンドポイントのURLを入れる
+      var headers = {
+        "Content-Type": "application/json"};
+      var body = json.encode({"access_token": accessToken});
+
+      var response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        // ログイン成功時の処理
+        var responseData = json.decode(response.body);
+        await storage.write(key: "accessToken", value: responseData['access_token']); 
+        //Navigator.push(
+        //  context,
+        //  MaterialPageRoute(builder: (context) => HomePage()),
+        //);
+      } 
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
       home: DefaultTabController(
         length: 2,
@@ -95,10 +128,12 @@ class LoginPage extends StatelessWidget{
 }
 
 Future<void> login(String username, String password) async {
+  print('aaa');
+  String? accessToken = await storage.read(key: "accessToken");
   var url = Uri.parse('http:/localhost/api/login/');  //ログインエンドポイントのURLを入れる
   var headers = {
     "Content-Type": "application/json",
-    "Authorization": "Bearer YOUR_ACCESS_TOKEN"};
+    "Authorization": "Bearer $accessToken"};
   var body = json.encode({"username": username, "password": password});
 
   var response = await http.post(url, headers: headers, body: body);
