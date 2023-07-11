@@ -35,7 +35,10 @@ class VideoListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: SizedBox(height: 120, child: _video.image),
-      title: Text(_video.title),
+      title: Text(
+        _video.title,
+        overflow: TextOverflow.ellipsis,
+      ),
       onTap: () {
         Navigator.pushNamed(context, "index", arguments: _video);
       },

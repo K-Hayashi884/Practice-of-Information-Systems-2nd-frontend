@@ -29,13 +29,18 @@ class TopPage extends StatelessWidget {
             VideoList([
               VideoListTile(Video(
                 url: "www.google.com",
-                title: "おすすめ動画１",
+                title:
+                    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
                 image: Image.asset("images/dummy_thumbnail.png"),
                 indices: [
                   {"timestamp": "0:20", "headline": "オープニング"},
                   {"timestamp": "10:33", "headline": "議題１"},
                 ],
-                comments: ["12:34 ここ好き", "56:78 ここ好き"],
+                comments: [
+                  "12:34 ここ好き",
+                  "56:78 ここ好き",
+                  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+                ],
               )),
               VideoListTile(Video(
                 url: "www.google.com",
