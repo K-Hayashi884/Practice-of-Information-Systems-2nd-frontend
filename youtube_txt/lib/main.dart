@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:youtube_txt/index.dart';
 import 'package:youtube_txt/top.dart';
 
+import 'package:youtube_txt/Userpage.dart';
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -15,8 +17,9 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.white,
       ),
       routes: {
-        '/': (context) => const TopPage(),
-        'index': (context) => const IndexPage(),
+        '/top': (context) => const TopPage(),
+        'index': (context) => IndexPage(),
+        "/": (context) => const UserPage(),
       },
     );
   }

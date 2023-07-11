@@ -1,8 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_txt/model/video.dart';
+import 'auth_service.dart';
+import 'package:provider/provider.dart';
+import 'auth_provider.dart';
 
 class IndexPage extends StatelessWidget {
-  const IndexPage({super.key});
+  final AuthService _authService = AuthService();
+
+  // const IndexPage({super.key});
+  Future<void> fetchProtectedPage(BuildContext context) async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final token = authProvider.token;
+      final result = await _authService.fetchProtectedPage(
+        'protected-page1',
+        token!,
+      );
+      print(result);
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to fetch protected page.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
