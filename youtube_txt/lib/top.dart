@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_txt/widget/video_list.dart';
 
-class TopPage extends StatefulWidget {
+import 'model/video.dart';
+
+class TopPage extends StatelessWidget {
   const TopPage({super.key});
-
-  @override
-  State<TopPage> createState() => _TopPageState();
-}
-
-class _TopPageState extends State<TopPage> {
-  String _text = "";
 
   @override
   Widget build(BuildContext context) {
@@ -31,56 +27,30 @@ class _TopPageState extends State<TopPage> {
               ),
             ),
             VideoList([
-              VideoListTile(
-                  Image.asset("images/dummy_thumbnail.png"), "おすすめ動画１"),
-              VideoListTile(
-                  Image.asset("images/dummy_thumbnail.png"), "おすすめ動画２"),
-              VideoListTile(
-                  Image.asset("images/dummy_thumbnail.png"), "おすすめ動画３"),
+              VideoListTile(Video(
+                url: "www.google.com",
+                title: "おすすめ動画１",
+                image: Image.asset("images/dummy_thumbnail.png"),
+                indices: [
+                  {"timestamp": "0:20", "headline": "オープニング"},
+                  {"timestamp": "10:33", "headline": "議題１"},
+                ],
+                comments: ["12:34 ここ好き", "56:78 ここ好き"],
+              )),
+              VideoListTile(Video(
+                url: "www.google.com",
+                title: "おすすめ動画２",
+                image: Image.asset("images/dummy_thumbnail.png"),
+              )),
+              VideoListTile(Video(
+                url: "www.google.com",
+                title: "おすすめ動画３",
+                image: Image.asset("images/dummy_thumbnail.png"),
+              )),
             ])
           ],
         ),
       ),
-    );
-  }
-}
-
-class VideoList extends StatelessWidget {
-  final List<VideoListTile> videos;
-
-  const VideoList(this.videos, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.only(top: 20.0),
-      itemBuilder: (context, index) => Container(
-        padding: const EdgeInsets.all(20.0),
-        alignment: Alignment.centerLeft,
-        child: videos[index],
-      ),
-      separatorBuilder: (context, index) {
-        return const Divider(height: 0.5);
-      },
-      itemCount: videos.length,
-      scrollDirection: Axis.vertical,
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-    );
-  }
-}
-
-class VideoListTile extends StatelessWidget {
-  final Image image;
-  final String title;
-
-  const VideoListTile(this.image, this.title, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Container(height: 120, child: image),
-      title: Text(title),
     );
   }
 }
