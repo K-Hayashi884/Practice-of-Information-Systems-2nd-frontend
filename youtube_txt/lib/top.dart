@@ -35,7 +35,7 @@ class TopPage extends StatelessWidget {
                   {"timestamp": "0:20", "headline": "オープニング"},
                   {"timestamp": "10:33", "headline": "議題１"},
                 ],
-                comments: ["15:42 ここ好き"],
+                comments: ["12:34 ここ好き", "56:78 ここ好き"],
               )),
               VideoListTile(Video(
                 url: "www.google.com",
