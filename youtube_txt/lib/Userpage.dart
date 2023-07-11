@@ -96,7 +96,9 @@ class LoginPage extends StatelessWidget{
 
 Future<void> login(String username, String password) async {
   var url = Uri.parse('http:/localhost/api/login/');  //ログインエンドポイントのURLを入れる
-  var headers = {"Content-Type": "application/json"};
+  var headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_ACCESS_TOKEN"};
   var body = json.encode({"username": username, "password": password});
 
   var response = await http.post(url, headers: headers, body: body);
@@ -105,7 +107,6 @@ Future<void> login(String username, String password) async {
     // ログイン成功時の処理
     var responseData = json.decode(response.body);
     await storage.write(key: "accessToken", value: responseData['access_token']);  //あとでログイン時に参照できるようにする？？
-
   } else {
     // ログインエラー時の処理
     throw Exception('ログインエラー');
@@ -168,12 +169,35 @@ class SignupPage extends StatelessWidget{
               String username = signupUsernameFromui.text;
               String password = signupPasswordFromui.text;
               String passwordAgain = signupPasswordAgainFromui.text;
-              print(username+password);//signupのための関数
+              signup(username,password,passwordAgain);//signupのための関数
             },
             child: const Text('Sign Up')
           )
         )
       ]
     );
+  }
+}
+
+Future<void> signup(String username, String password, String passwordAgain) async {
+  if(password == passwordAgain){
+    var url = Uri.parse('http:/localhost/api/login/');  //ログインエンドポイントのURLを入れる
+    var headers = {
+      "Content-Type": "application/json"
+    };
+    var body = json.encode({"username": username, "password": password});
+
+    var response = await http.post(url, headers: headers, body: body);
+
+    if (response.statusCode == 201) {
+      // ログイン成功時の処理
+      var responseData = json.decode(response.body);
+      await storage.write(key: "accessToken", value: responseData['access_token']);  //あとでログイン時に参照できるようにする？？
+    } else {
+      // ログインエラー時の処理
+      throw Exception('ログインエラー');
+    }
+  }else{
+    throw Exception('パスワードが一致しません');
   }
 }
