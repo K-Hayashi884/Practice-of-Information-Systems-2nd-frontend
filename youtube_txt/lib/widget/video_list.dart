@@ -27,21 +27,22 @@ class VideoList extends StatelessWidget {
 }
 
 class VideoListTile extends StatelessWidget {
-  final Video _video;
-
-  const VideoListTile(this._video, {super.key});
+  final Video video;
+  final Widget? trailing;
+  const VideoListTile(this.video, {super.key, this.trailing});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: SizedBox(height: 120, child: _video.image),
+      leading: SizedBox(height: 120, child: video.image),
       title: Text(
-        _video.title,
+        video.title,
         overflow: TextOverflow.ellipsis,
       ),
       onTap: () {
-        Navigator.pushNamed(context, "index", arguments: _video);
+        Navigator.pushNamed(context, "index", arguments: video);
       },
+      trailing: trailing,
     );
   }
 }

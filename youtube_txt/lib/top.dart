@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_txt/widget/drawer_menu.dart';
 import 'package:youtube_txt/widget/video_list.dart';
 
 import 'model/video.dart';
@@ -12,6 +13,7 @@ class TopPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Youtube.txt"),
       ),
+      endDrawer: const DrawerMenu(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -19,11 +21,6 @@ class TopPage extends StatelessWidget {
               padding: EdgeInsets.all(16),
               child: TextField(
                 decoration: InputDecoration(prefixIcon: Icon(Icons.search)),
-                // onChanged: (value) {
-                //   setState(() {
-                //     _text = value;
-                //   });
-                // },
               ),
             ),
             VideoList([
@@ -39,7 +36,12 @@ class TopPage extends StatelessWidget {
                 comments: [
                   "12:34 ここ好き",
                   "56:78 ここ好き",
-                  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+                  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+                  "a",
+                  "b",
+                  "c",
+                  "d",
+                  "e"
                 ],
               )),
               VideoListTile(Video(

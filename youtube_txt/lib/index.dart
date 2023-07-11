@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_txt/model/video.dart';
+import 'package:youtube_txt/widget/drawer_menu.dart';
 
 class IndexPage extends StatelessWidget {
   const IndexPage({super.key});
@@ -103,6 +104,7 @@ class IndexPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Youtube.txt")),
+      endDrawer: const DrawerMenu(),
       body: CustomScrollView(
         slivers: [
           SliverList(delegate: SliverChildListDelegate(thumbnailItems)),
