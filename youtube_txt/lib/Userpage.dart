@@ -147,17 +147,23 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  String _email = "", _password = "", _passwordAgain = "", type = "login";
+  String _email = "",
+      _username = "",
+      _password = "",
+      _passwordAgain = "",
+      type = "login";
   User? user;
 
   @override
   Widget build(BuildContext context) {
     final signupEmailFromui = TextEditingController();
+    final signupUsernameFromui = TextEditingController();
     final signupPasswordFromui = TextEditingController();
     final signupPasswordAgainFromui = TextEditingController();
     String _errorText = '';
 
-    return Column(children: [
+    return SingleChildScrollView(
+        child: Column(children: [
       Container(
         alignment: Alignment.centerLeft,
         child: const Text('Sign Up',
@@ -168,6 +174,13 @@ class _SignupPageState extends State<SignupPage> {
         controller: signupEmailFromui,
         decoration: const InputDecoration(
           labelText: "メールアドレス：",
+        ),
+      ),
+      const SizedBox(height: 20),
+      TextField(
+        controller: signupUsernameFromui,
+        decoration: const InputDecoration(
+          labelText: "ユーザ名：",
         ),
       ),
       const SizedBox(height: 10),
@@ -192,19 +205,23 @@ class _SignupPageState extends State<SignupPage> {
           child: ElevatedButton(
               onPressed: () {
                 _email = signupEmailFromui.text;
+                _username = signupUsernameFromui.text;
                 _password = signupPasswordFromui.text;
                 _passwordAgain = signupPasswordAgainFromui.text;
                 // パスワードが同じか確認
                 if (_password == _passwordAgain) {
                   _signup(); //signupのための関数
+                  // _emailをDjangoに送信する
+                  _sendUserInfo();
                 } else {
                   setState(() {
                     _errorText = 'パスワードが一致しません';
                   });
+                  print(_errorText);
                 }
               },
               child: const Text('Sign Up')))
-    ]);
+    ]));
   }
 
   Future<void> _signup() async {
@@ -219,15 +236,6 @@ class _SignupPageState extends State<SignupPage> {
           content: Text('${user!.email} signed in'),
         ),
       );
-      // _emailをDjangoに送信する
-      final _ = await http.post(
-        SignUpUri(),
-        body: {'email': _email},
-      );
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const TopPage()),
-      );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
@@ -236,6 +244,26 @@ class _SignupPageState extends State<SignupPage> {
       }
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<void> _sendUserInfo() async {
+    final response = await http.post(
+      SignUpUri(),
+      body: {'email': _email, "username": _username},
+    );
+    print(response);
+    if (response.statusCode == 201) {
+      // サインアップ成功時
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TopPage()),
+      );
+    } else {
+      // リクエスト失敗の処理
+      print(response.body);
+      throw Exception(
+          'Request failed with status ${response.statusCode}' + response.body);
     }
   }
 }
