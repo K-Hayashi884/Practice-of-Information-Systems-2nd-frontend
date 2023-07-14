@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_txt/auth_provider.dart';
-import 'package:youtube_txt/index.dart';
-import 'package:youtube_txt/top.dart';
 
 import 'package:youtube_txt/Userpage.dart';
+import 'package:youtube_txt/top.dart';
 
-void main() {
-  runApp(
-    // MyAppの直下にProviderを配置
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        // 追加のプロバイダーがある場合はここに追加してください
-      ],
-      child: const MyApp(),
-    ),
-  );
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -31,7 +26,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/top': (context) => const TopPage(),
-        'index': (context) => const IndexPage(),
+        // 'index': (context) => const IndexPage(),
         "/": (context) => const UserPage(),
       },
     );

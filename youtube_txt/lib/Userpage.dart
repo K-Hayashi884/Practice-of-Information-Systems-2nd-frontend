@@ -1,17 +1,23 @@
-import 'dart:convert';
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
-import 'package:youtube_txt/urls.dart';
-import 'auth_service.dart';
-import 'auth_provider.dart';
+import 'package:flutter/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:youtube_txt/top.dart';
+import 'package:youtube_txt/urls.dart';
+import 'package:http/http.dart' as http;
 
-// const storage = FlutterSecureStorage();
-
-class UserPage extends StatelessWidget {
+class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
+
+  @override
+  _UserPageState createState() => _UserPageState();
+}
+
+class _UserPageState extends State<UserPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +34,8 @@ class UserPage extends StatelessWidget {
               ],
             ),
           ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 120, horizontal: 50),
+          body: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 120, horizontal: 50),
             child: TabBarView(
               children: [
                 LoginPage(),
@@ -43,45 +49,28 @@ class UserPage extends StatelessWidget {
   }
 }
 
-class LoginPage extends StatelessWidget {
-  LoginPage({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
-  final TextEditingController loginUsernameFromui = TextEditingController();
-  final TextEditingController loginPasswordFromui = TextEditingController();
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
 
-  void _login(BuildContext context) async {
-    try {
-      // トークンを取得・保存
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final AuthService _authService = AuthService();
-      final token = await _authService.login(
-        loginUsernameFromui.text,
-        loginPasswordFromui.text,
-        context,
-      );
-      authProvider.setToken(token);
-    } catch (e) {
-      print(e);
-      showDialog(
-        context: context,
-        builder: (BuildContext dialogContext) {
-          return AlertDialog(
-            title: Text('Login Failed'),
-            content: Text('Invalid username or password.'),
-            actions: [
-              TextButton(
-                child: Text('OK'),
-                onPressed: () => Navigator.of(dialogContext).pop(),
-              ),
-            ],
-          );
-        },
-      );
-    }
+class _LoginPageState extends State<LoginPage> {
+  String _email = "", _password = "", type = "login";
+  User? user;
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final loginEmailFromui = TextEditingController();
+    final loginPasswordFromui = TextEditingController();
+    String errorText = "";
+
     return Column(children: [
       Container(
         alignment: Alignment.centerLeft,
@@ -90,9 +79,9 @@ class LoginPage extends StatelessWidget {
       ),
       const SizedBox(height: 20),
       TextField(
-        controller: loginUsernameFromui,
+        controller: loginEmailFromui,
         decoration: const InputDecoration(
-          labelText: "ユーザー名：",
+          labelText: "メールアドレス：",
         ),
       ),
       const SizedBox(height: 10),
@@ -101,53 +90,72 @@ class LoginPage extends StatelessWidget {
           decoration: const InputDecoration(labelText: "パスワード："),
           obscureText: true),
       const SizedBox(height: 20),
-      SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: () {
-            _login(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const TopPage()),
-            );
-          },
-          child: const Text('Login'),
+      // 失敗したらエラーを表示
+      if (errorText.isNotEmpty)
+        Text(
+          errorText,
+          style: const TextStyle(color: Colors.red),
         ),
-      ),
+      SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+              onPressed: () {
+                _email = loginEmailFromui.text;
+                _password = loginPasswordFromui.text;
+                _login(errorText); //loginのための関数
+              },
+              child: const Text('Login')))
     ]);
+  }
+
+  Future<void> _login(String errorText) async {
+    try {
+      final User? user =
+          (await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _email,
+        password: _password,
+      ))
+              .user;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${user!.email} signed in'),
+        ),
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TopPage()),
+      );
+    } catch (e) {
+      print(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        // const SnackBar(
+        //   content: Text('Failed to sign in with Email & Password'),
+        // ),
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+    }
   }
 }
 
-// Future<void> login(String username, String password) async {
-//   var url = Uri.parse('http:/localhost/api/login/'); //ログインエンドポイントのURLを入れる
-//   var headers = {
-//     "Content-Type": "application/json",
-//     "Authorization": "Bearer YOUR_ACCESS_TOKEN"
-//   };
-//   var body = json.encode({"username": username, "password": password});
+class SignupPage extends StatefulWidget {
+  const SignupPage({Key? key}) : super(key: key);
 
-//   var response = await http.post(url, headers: headers, body: body);
+  @override
+  _SignupPageState createState() => _SignupPageState();
+}
 
-//   if (response.statusCode == 200) {
-//     // ログイン成功時の処理
-//     var responseData = json.decode(response.body);
-//     await storage.write(
-//         key: "accessToken",
-//         value: responseData['access_token']); //あとでログイン時に参照できるようにする？？
-//   } else {
-//     // ログインエラー時の処理
-//     throw Exception('ログインエラー');
-//   }
-// }
-
-class SignupPage extends StatelessWidget {
-  const SignupPage({super.key});
+class _SignupPageState extends State<SignupPage> {
+  String _email = "", _password = "", _passwordAgain = "", type = "login";
+  User? user;
 
   @override
   Widget build(BuildContext context) {
-    final signupUsernameFromui = TextEditingController();
+    final signupEmailFromui = TextEditingController();
     final signupPasswordFromui = TextEditingController();
     final signupPasswordAgainFromui = TextEditingController();
+    String _errorText = '';
 
     return Column(children: [
       Container(
@@ -157,9 +165,9 @@ class SignupPage extends StatelessWidget {
       ),
       const SizedBox(height: 20),
       TextField(
-        controller: signupUsernameFromui,
+        controller: signupEmailFromui,
         decoration: const InputDecoration(
-          labelText: "ユーザー名：",
+          labelText: "メールアドレス：",
         ),
       ),
       const SizedBox(height: 10),
@@ -173,40 +181,61 @@ class SignupPage extends StatelessWidget {
           decoration: const InputDecoration(labelText: "パスワード（確認）："),
           obscureText: true),
       const SizedBox(height: 20),
+      // 失敗したらエラーを表示
+      if (_errorText.isNotEmpty)
+        Text(
+          _errorText,
+          style: const TextStyle(color: Colors.red),
+        ),
       SizedBox(
           width: double.infinity,
           child: ElevatedButton(
               onPressed: () {
-                String username = signupUsernameFromui.text;
-                String password = signupPasswordFromui.text;
-                String passwordAgain = signupPasswordAgainFromui.text;
-                signup(username, password, passwordAgain); //signupのための関数
+                _email = signupEmailFromui.text;
+                _password = signupPasswordFromui.text;
+                _passwordAgain = signupPasswordAgainFromui.text;
+                // パスワードが同じか確認
+                if (_password == _passwordAgain) {
+                  _signup(); //signupのための関数
+                } else {
+                  setState(() {
+                    _errorText = 'パスワードが一致しません';
+                  });
+                }
               },
               child: const Text('Sign Up')))
     ]);
   }
-}
 
-Future<void> signup(
-    String username, String password, String passwordAgain) async {
-  if (password == passwordAgain) {
-    var url = Uri.parse('http:/localhost/api/login/'); //ログインエンドポイントのURLを入れる
-    var headers = {"Content-Type": "application/json"};
-    var body = json.encode({"username": username, "password": password});
-
-    var response = await http.post(url, headers: headers, body: body);
-
-    if (response.statusCode == 201) {
-      // ログイン成功時の処理
-      var responseData = json.decode(response.body);
-      // await storage.write(
-      //     key: "accessToken",
-      //     value: responseData['access_token']); //あとでログイン時に参照できるようにする？？
-    } else {
-      // ログインエラー時の処理
-      throw Exception('ログインエラー');
+  Future<void> _signup() async {
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _email,
+        password: _password,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${user!.email} signed in'),
+        ),
+      );
+      // _emailをDjangoに送信する
+      final _ = await http.post(
+        SignUpUri(),
+        body: {'email': _email},
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TopPage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
     }
-  } else {
-    throw Exception('パスワードが一致しません');
   }
 }
