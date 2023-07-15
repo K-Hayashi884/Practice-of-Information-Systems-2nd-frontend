@@ -34,9 +34,9 @@ class Requester {
     }
   }
 
-  Future<void> signUpRequester(String name, String password, String email) async {
+  Future<void> signUpRequester(String name, String email, String password) async {
 
-    var request = RegisterRequest(name: name, password: password, email: email);
+    var request = RegisterRequest(name: name, email: email, password: password,);
 
     debugPrint(name);
     debugPrint(password);
@@ -109,6 +109,24 @@ class RegisterResponse {
         username = json['username'];
 }
 
+class RegisterRequest {
+  final String name;
+  final String password;
+  final String email;
+
+  RegisterRequest({
+    this.name = "",
+    this.password = "",
+    this.email = "",
+  });
+
+  Map<String, dynamic> toJson() => {
+        'password': password,
+        'username': name,
+        'email': email,
+      };
+}
+
 
 
 class AuthResponse {
@@ -130,23 +148,5 @@ class AuthRequest {
   Map<String, dynamic> toJson() => {
         'password': password,
         'username': name,
-      };
-}
-
-class RegisterRequest {
-  final String name;
-  final String password;
-  final String email;
-
-  RegisterRequest({
-    this.name = "",
-    this.password = "",
-    this.email = "",
-  });
-
-  Map<String, dynamic> toJson() => {
-        'password': password,
-        'username': name,
-        'email': email,
       };
 }

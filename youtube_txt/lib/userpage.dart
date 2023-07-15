@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:youtube_txt/requester/requester.dart';
+import 'package:youtube_txt/top.dart';
 
 
 const storage = FlutterSecureStorage();
@@ -15,33 +17,33 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage>{
-  @override
-  void initState(){
-    super.initState();
-    initialize();
-  }
+  // @override
+  // void initState(){
+  //   super.initState();
+  //   initialize();
+  // }
 
-  Future<void> initialize() async{
-    String? accessToken = await storage.read(key: "accessToken");
-    if(accessToken != null){
-      var url = Uri.parse('http:/localhost/api/login/');  //ログインエンドポイントのURLを入れる
-      var headers = {
-        "Content-Type": "application/json"};
-      var body = json.encode({"access_token": accessToken});
+  // Future<void> initialize() async{
+  //   String? accessToken = await storage.read(key: "accessToken");
+  //   if(accessToken != null){
+  //     var url = Uri.parse('http:/localhost/api/login/');  //ログインエンドポイントのURLを入れる
+  //     var headers = {
+  //       "Content-Type": "application/json"};
+  //     var body = json.encode({"access_token": accessToken});
 
-      var response = await http.post(url, headers: headers, body: body);
+  //     var response = await http.post(url, headers: headers, body: body);
 
-      if (response.statusCode == 200) {
-        // ログイン成功時の処理
-        var responseData = json.decode(response.body);
-        await storage.write(key: "accessToken", value: responseData['access_token']); 
-        //Navigator.push(
-        //  context,
-        //  MaterialPageRoute(builder: (context) => HomePage()),
-        //);
-      } 
-    }
-  }
+  //     if (response.statusCode == 200) {
+  //       // ログイン成功時の処理
+  //       var responseData = json.decode(response.body);
+  //       await storage.write(key: "accessToken", value: responseData['access_token']); 
+  //       //Navigator.push(
+  //       //  context,
+  //       //  MaterialPageRoute(builder: (context) => HomePage()),
+  //       //);
+  //     } 
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,7 @@ class _UserPageState extends State<UserPage>{
             child: TabBarView(
               children:[
                 LoginPage(),
-                SignupPage(),
+                SignUpPage(),
               ],
             ),
           ),
@@ -73,95 +75,84 @@ class _UserPageState extends State<UserPage>{
   }
 }
 
-class LoginPage extends StatelessWidget{
-  const LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context){
-    final loginUsernameFromui = TextEditingController();
-    final loginPasswordFromui = TextEditingController();
-    
-     
-     return Column(
-      children: [
-        Container(
-          alignment: Alignment.centerLeft,
-          child:
-            const Text(
-              'Login',
-               style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.black
-                )
-              ),
-            ), 
-        const SizedBox(height: 20), 
-        TextField(
-          controller: loginUsernameFromui,
-          decoration: const InputDecoration(
-            labelText: "ユーザー名：",
-          ),
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final loginUsernameFromui = TextEditingController();
+  final loginPasswordFromui = TextEditingController();
+  var _errorMessage = "";
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Container(
+        alignment: Alignment.centerLeft,
+        child: const Text('Login',
+            style: TextStyle(fontSize: 30, color: Colors.black)),
+      ),
+      const SizedBox(height: 12.0),
+      Text(_errorMessage, style: const TextStyle(color: Colors.red)),
+      TextField(
+        controller: loginUsernameFromui,
+        decoration: const InputDecoration(
+          labelText: "メールアドレス：",
         ),
-        const SizedBox(height: 10),
-        TextField(
+      ),
+      const SizedBox(height: 10),
+      TextField(
           controller: loginPasswordFromui,
-          decoration: const InputDecoration(
-            labelText: "パスワード："
-            ),
-          obscureText:true
-        ),
-        const SizedBox(height: 20),
-        SizedBox(
+          decoration: const InputDecoration(labelText: "パスワード："),
+          obscureText: true),
+      const SizedBox(height: 20),   
+      SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: (){
-              String username = loginUsernameFromui.text;
-              String password = loginPasswordFromui.text;
-              login(username,password);//loginのための関数
-            },
+              onPressed: () {
+                Requester()
+                    .loginRequester(loginUsernameFromui.text, loginPasswordFromui.text)
+                    .then((_) {
+                      setState(() {
+                        _errorMessage = "";
+                      });
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const TopPage()));
+                    }).onError((error, stackTrace) {
+                      debugPrint(error.toString());
+                      loginPasswordFromui.clear();
+                      setState(() {
+                        _errorMessage = "ログインに失敗しました。ユーザー名かパスワードが間違っています。";
+                      });
+                    });
+              },
             child: const Text('Login')
           )
-        )
-      ]
-    );
+      )
+    ]);
   }
 }
 
-Future<void> login(String username, String password) async {
-  print('aaa');
-  String? accessToken = await storage.read(key: "accessToken");
-  var url = Uri.parse('http:/localhost/api/login/');  //ログインエンドポイントのURLを入れる
-  var headers = {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer $accessToken"};
-  var body = json.encode({"username": username, "password": password});
-
-  var response = await http.post(url, headers: headers, body: body);
-
-  if (response.statusCode == 200) {
-    // ログイン成功時の処理
-    var responseData = json.decode(response.body);
-    await storage.write(key: "accessToken", value: responseData['access_token']);  //あとでログイン時に参照できるようにする？？
-  } else {
-    // ログインエラー時の処理
-    throw Exception('ログインエラー');
-  }
-}
-
-
-
-
-
-class SignupPage extends StatelessWidget{
-  const SignupPage({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context){
-    final signupUsernameFromui = TextEditingController();
-    final signupPasswordFromui = TextEditingController();
-    final signupPasswordAgainFromui = TextEditingController();
-     
-     return Column(
+  State<SignUpPage> createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+  final signupUsernameFromui = TextEditingController();
+  final signupEmailFromui = TextEditingController();
+  final signupPasswordFromui = TextEditingController();
+  final signupPasswordAgainFromui = TextEditingController();
+  var _errorMessage = "";
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Column(
       children: [
         Container(
           alignment: Alignment.centerLeft,
@@ -174,10 +165,18 @@ class SignupPage extends StatelessWidget{
           ),
         ), 
         const SizedBox(height: 20), 
+        Text(_errorMessage, style: const TextStyle(color: Colors.red)),
         TextField(
           controller: signupUsernameFromui,
           decoration: const InputDecoration(
             labelText: "ユーザー名：",
+          ),
+        ),
+        const SizedBox(height: 20), 
+        TextField(
+          controller: signupEmailFromui,
+          decoration: const InputDecoration(
+            labelText: "メールアドレス：",
           ),
         ),
         const SizedBox(height: 10),
@@ -200,39 +199,26 @@ class SignupPage extends StatelessWidget{
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: (){
-              String username = signupUsernameFromui.text;
-              String password = signupPasswordFromui.text;
-              String passwordAgain = signupPasswordAgainFromui.text;
-              signup(username,password,passwordAgain);//signupのための関数
-            },
+            onPressed: () {
+              Requester()
+                .signUpRequester(signupUsernameFromui.text,signupEmailFromui.text, signupPasswordFromui.text)
+                    .then((_) {
+                      setState(() {
+                        _errorMessage = "";
+                      });
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const UserPage()));
+                    }).onError((error, stackTrace) {
+                      debugPrint(error.toString());
+                      signupPasswordFromui.clear();
+                      setState(() {
+                        _errorMessage = "ユーザーの作成に失敗しました。すでに登録済みのユーザーです。";
+                      });
+                    });
+              },
             child: const Text('Sign Up')
           )
         )
       ]
     );
-  }
-}
-
-Future<void> signup(String username, String password, String passwordAgain) async {
-  if(password == passwordAgain){
-    var url = Uri.parse('http:/localhost/api/login/');  //ログインエンドポイントのURLを入れる
-    var headers = {
-      "Content-Type": "application/json"
-    };
-    var body = json.encode({"username": username, "password": password});
-
-    var response = await http.post(url, headers: headers, body: body);
-
-    if (response.statusCode == 201) {
-      // ログイン成功時の処理
-      var responseData = json.decode(response.body);
-      await storage.write(key: "accessToken", value: responseData['access_token']);  //あとでログイン時に参照できるようにする？？
-    } else {
-      // ログインエラー時の処理
-      throw Exception('ログインエラー');
-    }
-  }else{
-    throw Exception('パスワードが一致しません');
   }
 }
