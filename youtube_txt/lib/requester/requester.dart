@@ -13,7 +13,7 @@ class Requester {
   Map<String, String> headers = {
     "Content-Type": "application/json",
   };
-  final storage = new FlutterSecureStorage();
+  final storage =const FlutterSecureStorage();
 
   Requester() {}
 
@@ -76,18 +76,8 @@ class Requester {
   }
 
   Future<void> logoutRequester() async {
-    var logoutUri = uri + "auth/logout";
-    var accessToken = await storage.read(key: "accessToken");
-    headers["Authorization"] = accessToken ?? "";
-
-    final response = await http.post(Uri.parse(logoutUri), headers: headers);
-
-    if (response.statusCode == 201) {
-      await storage.delete(key: "accessToken");
-    }
+    await storage.delete(key: "accessToken");
   }
-
-
 }
 
 

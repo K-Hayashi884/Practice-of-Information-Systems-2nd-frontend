@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_txt/requester/requester.dart';
 
 class DrawerMenu extends StatelessWidget {
   const DrawerMenu({super.key});
@@ -21,6 +22,20 @@ class DrawerMenu extends StatelessWidget {
               child: const Text("あとで見る"),
               onPressed: () {
                 Navigator.pushReplacementNamed(context, "later");
+              },
+            ),
+          ),
+          ListTile(
+            title: TextButton(
+              child: const Text("ログアウト"),
+              onPressed: () {
+                Requester()
+                  .logoutRequester()
+                  .then((_) {
+                    Navigator.pushNamedAndRemoveUntil(context, "loginTop",(_) => false);
+                  }).onError((error, stackTrace){ 
+                    debugPrint(error.toString());
+                  });
               },
             ),
           ),
