@@ -34,7 +34,7 @@ class VideoListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: SizedBox(height: 120, child: video.image),
+      leading: SizedBox(height: 120, child: Image.network(video.imageUrl)),
       title: Text(
         video.title,
         overflow: TextOverflow.ellipsis,
