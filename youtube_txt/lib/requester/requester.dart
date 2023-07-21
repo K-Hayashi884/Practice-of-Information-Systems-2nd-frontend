@@ -58,6 +58,22 @@ class Requester {
     }
   }
 
+  Future<List<TopResponse>> topRequester() async {
+    var accessToken = await storage.read(key: "accessToken");
+    headers["Authorization"] = "Token $accessToken";
+
+    debugPrint("send topRequester");
+    final response = await http.get(topUri(), headers: headers);
+
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body).cast<Map<String, dynamic>>();
+      List<TopResponse> videoList = decoded.map<TopResponse>((json) => TopResponse.fromJson(json)).toList();
+      return videoList;
+    } else {
+      throw Exception("Top Error");
+    }
+  }
+
   Future<String> helloRequester() async {
     var helloUri = uri + "api/v1/account/1/";
     var accessToken = await storage.read(key: "accessToken");
@@ -118,7 +134,6 @@ class RegisterRequest {
 }
 
 
-
 class AuthResponse {
   final String accessToken;
 
@@ -139,4 +154,17 @@ class AuthRequest {
         'password': password,
         'username': name,
       };
+}
+
+class TopResponse {
+  final String id;
+  final String thumbnailUrl;
+  final int count;
+  final String title;
+
+  TopResponse.fromJson(Map<String, dynamic> json)
+      : id = json['video_id'],
+        thumbnailUrl = json['video_thumbnail_url'],
+        count = json['video_count'],
+        title = json['video_title'];
 }

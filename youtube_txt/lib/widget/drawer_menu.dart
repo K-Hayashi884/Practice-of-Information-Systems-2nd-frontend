@@ -29,13 +29,34 @@ class DrawerMenu extends StatelessWidget {
             title: TextButton(
               child: const Text("ログアウト"),
               onPressed: () {
-                Requester()
-                  .logoutRequester()
-                  .then((_) {
-                    Navigator.pushNamedAndRemoveUntil(context, "loginTop",(_) => false);
-                  }).onError((error, stackTrace){ 
-                    debugPrint(error.toString());
-                  });
+                showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      content: const Text('Do you want logout?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('No'),
+                          onPressed: () {
+                            Navigator.of(context).pop(false);
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('Yes'),
+                          onPressed: () {
+                            Requester()
+                            .logoutRequester()
+                            .then((_) {
+                              Navigator.pushNamedAndRemoveUntil(context, "loginTop",(_) => false);
+                            }).onError((error, stackTrace){ 
+                              debugPrint(error.toString());
+                            });
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
             ),
           ),
