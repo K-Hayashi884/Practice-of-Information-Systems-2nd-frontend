@@ -4,9 +4,10 @@ import 'package:flutter/foundation.dart';
 // https://stackoverflow.com/questions/55785581/socketexception-os-error-connection-refused-errno-111-in-flutter-using-djan
 //const String baseUrl = 'http://10.0.2.2:8000';
 
-String baseUri = defaultTargetPlatform == TargetPlatform.android
-      ? 'http://10.0.2.2:8000'
-      : 'http://127.0.0.1:8000';
+// String baseUri = defaultTargetPlatform == TargetPlatform.android
+//       ? 'http://10.0.2.2:8000'
+//       : 'http://127.0.0.1:8000';
+String baseUri = "http://yu0ki.pythonanywhere.com/";
 
 Uri signInUri() {
   return Uri.parse('$baseUri/api-token-auth/');
