@@ -20,7 +20,7 @@ class LaterVideosPage extends StatelessWidget {
             url: "www.google.com",
             title:
                 "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-            image: Image.asset("images/dummy_thumbnail.png"),
+            imageUrl: "https://i.ytimg.com/vi/XOkUJYVALQE/default.jpg",
             indices: [
               {"timestamp": "0:20", "headline": "オープニング"},
               {"timestamp": "10:33", "headline": "議題１"},
@@ -39,12 +39,12 @@ class LaterVideosPage extends StatelessWidget {
           LaterVideoListTile(Video(
             url: "www.google.com",
             title: "おすすめ動画２",
-            image: Image.asset("images/dummy_thumbnail.png"),
+            imageUrl: "https://i.ytimg.com/vi/XOkUJYVALQE/default.jpg",
           )),
           LaterVideoListTile(Video(
             url: "www.google.com",
             title: "おすすめ動画３",
-            image: Image.asset("images/dummy_thumbnail.png"),
+            imageUrl: "https://i.ytimg.com/vi/XOkUJYVALQE/default.jpg",
           )),
         ]),
       ),

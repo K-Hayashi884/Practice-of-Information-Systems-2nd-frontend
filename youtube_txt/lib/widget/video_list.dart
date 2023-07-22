@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_txt/model/video.dart';
+import 'package:provider/provider.dart';
 
 class VideoList extends StatelessWidget {
   final List<VideoListTile> videos;
@@ -33,13 +34,15 @@ class VideoListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context);
     return ListTile(
-      leading: SizedBox(height: 120, child: video.image),
+      leading: SizedBox(height: 120, child: Image.network(video.imageUrl)),
       title: Text(
         video.title,
         overflow: TextOverflow.ellipsis,
       ),
       onTap: () {
+        videoNotifier.setIndex(video.id);
         Navigator.pushNamed(context, "index", arguments: video);
       },
       trailing: trailing,

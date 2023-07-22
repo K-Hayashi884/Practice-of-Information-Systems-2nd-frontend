@@ -1,14 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:youtube_txt/widget/drawer_menu.dart';
 import 'package:youtube_txt/widget/video_list.dart';
+import 'package:youtube_txt/requester/requester.dart';
 
 import 'model/video.dart';
 
-class TopPage extends StatelessWidget {
+class TopPage extends StatefulWidget {
   const TopPage({super.key});
 
   @override
+  State<TopPage> createState() => _TopPageState();
+}
+
+class _TopPageState extends State<TopPage> {
+
+  @override
+  void initState() {
+    super.initState();
+    VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context, listen: false);
+    Requester().topRequester().then((value) {
+      videoNotifier.set(value);
+    }).onError((error, stackTrace) {
+      showDialog(
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              title: const Text("データの取得に失敗しました。"),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context), child: const Text("OK")),
+              ],
+            );
+          }).then((_) {
+        Navigator.pop(context);
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context);
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text("Youtube.txt"),
@@ -23,38 +56,9 @@ class TopPage extends StatelessWidget {
                 decoration: InputDecoration(prefixIcon: Icon(Icons.search)),
               ),
             ),
-            VideoList([
-              VideoListTile(Video(
-                url: "www.google.com",
-                title:
-                    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-                image: Image.asset("images/dummy_thumbnail.png"),
-                indices: [
-                  {"timestamp": "0:20", "headline": "オープニング"},
-                  {"timestamp": "10:33", "headline": "議題１"},
-                ],
-                comments: [
-                  "12:34 ここ好き",
-                  "56:78 ここ好き",
-                  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-                  "a",
-                  "b",
-                  "c",
-                  "d",
-                  "e"
-                ],
-              )),
-              VideoListTile(Video(
-                url: "www.google.com",
-                title: "おすすめ動画２",
-                image: Image.asset("images/dummy_thumbnail.png"),
-              )),
-              VideoListTile(Video(
-                url: "www.google.com",
-                title: "おすすめ動画３",
-                image: Image.asset("images/dummy_thumbnail.png"),
-              )),
-            ])
+            VideoList(
+              videoNotifier.videoTiles
+            )
           ],
         ),
       ),

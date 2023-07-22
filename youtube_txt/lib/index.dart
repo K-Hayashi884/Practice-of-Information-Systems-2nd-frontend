@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_txt/model/video.dart';
 import 'package:youtube_txt/widget/drawer_menu.dart';
+import 'package:provider/provider.dart';
 
 class IndexPage extends StatelessWidget {
   const IndexPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final video = ModalRoute.of(context)!.settings.arguments as Video;
+    VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context);
+    final video_route = ModalRoute.of(context)!.settings.arguments as Video;
     final deviceWidth = MediaQuery.of(context).size.width;
+    var video = videoNotifier.videos[
+      videoNotifier.getId(
+        video_route.id
+        )
+    ];
+    debugPrint(video.indices.toString());
 
     final List<Widget> thumbnailItems = [
       Padding(
@@ -16,8 +24,8 @@ class IndexPage extends StatelessWidget {
         child: SizedBox(
             width: deviceWidth * 0.8,
             child: Center(
-                child: video.image != null
-                    ? SizedBox(width: deviceWidth * 0.9, child: video.image!)
+                child: video.imageUrl != null
+                    ? SizedBox(width: deviceWidth * 0.9, child: Image.network(video.imageUrl))
                     : Image.asset("images/dummy_thumbnail.png"))),
       ),
       Padding(
