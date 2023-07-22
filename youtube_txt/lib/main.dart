@@ -5,8 +5,18 @@ import 'package:youtube_txt/top.dart';
 import 'package:youtube_txt/login.dart';
 import 'package:youtube_txt/signup.dart';
 import 'package:youtube_txt/login_top.dart';
+import 'package:provider/provider.dart';
+import 'package:youtube_txt/model/video.dart';
 
-void main() => runApp(const MyApp());
+
+// void main() => runApp(const MyApp());
+
+void main() {
+  runApp(ChangeNotifierProvider(
+    create: (context) => VideoNotifier(),
+    child: const MyApp(),
+  ));
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

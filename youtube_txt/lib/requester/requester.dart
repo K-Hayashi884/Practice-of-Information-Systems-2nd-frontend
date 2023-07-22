@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:youtube_txt/requester/urls.dart';
+import 'package:youtube_txt/model/video.dart';
 
 class Requester {
   String uri = defaultTargetPlatform == TargetPlatform.android
@@ -55,6 +56,38 @@ class Requester {
     } else {
       debugPrint("test fail");
       throw Exception("Sign UP Error");
+    }
+  }
+
+  Future<List<Video>> topRequester() async {
+    var accessToken = await storage.read(key: "accessToken");
+    headers["Authorization"] = "Token $accessToken";
+
+    debugPrint("send topRequester");
+    final response = await http.get(topUri(), headers: headers);
+
+    if (response.statusCode == 200) {
+      final decoded = json.decode(utf8.decode(response.bodyBytes)).cast<Map<String, dynamic>>();
+      List<Video> videoList = decoded.map<Video>((json) => Video.fromJson(json)).toList();
+      return videoList;
+    } else {
+      throw Exception("Top Error");
+    }
+  }
+
+  Future<List<Map<String, String>>> headlineRequester(videoId) async {
+    var accessToken = await storage.read(key: "accessToken");
+    headers["Authorization"] = "Token $accessToken";
+
+    debugPrint("send headlineRequester");
+    final response = await http.get(indexUri(videoId), headers: headers);
+
+    if (response.statusCode == 200) {
+      List<Map<String, dynamic>> decoded = await json.decode(utf8.decode(response.bodyBytes)).cast<Map<String, dynamic>>();
+      List<Map<String,String>> headlines = decoded.map<Map<String,String>>((json) => json.cast<String, String>()).toList();
+      return headlines;
+    } else {
+      throw Exception("headline(index) Error");
     }
   }
 
@@ -118,7 +151,6 @@ class RegisterRequest {
 }
 
 
-
 class AuthResponse {
   final String accessToken;
 
@@ -139,4 +171,17 @@ class AuthRequest {
         'password': password,
         'username': name,
       };
+}
+
+class TopResponse {
+  final String id;
+  final String thumbnailUrl;
+  final int count;
+  final String title;
+
+  TopResponse.fromJson(Map<String, dynamic> json)
+      : id = json['video_id'],
+        thumbnailUrl = json['video_thumbnail_url'],
+        count = json['video_count'],
+        title = json['video_title'];
 }
