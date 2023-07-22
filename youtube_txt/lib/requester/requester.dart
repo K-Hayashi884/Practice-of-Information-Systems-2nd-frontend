@@ -14,12 +14,11 @@ class Requester {
   Map<String, String> headers = {
     "Content-Type": "application/json",
   };
-  final storage =const FlutterSecureStorage();
+  final storage = const FlutterSecureStorage();
 
   Requester() {}
 
   Future<void> loginRequester(String name, String password) async {
-
     var request = AuthRequest(name: name, password: password);
 
     final response = await http.post(signInUri(),
@@ -35,9 +34,13 @@ class Requester {
     }
   }
 
-  Future<void> signUpRequester(String name, String email, String password) async {
-
-    var request = RegisterRequest(name: name, email: email, password: password,);
+  Future<void> signUpRequester(
+      String name, String email, String password) async {
+    var request = RegisterRequest(
+      name: name,
+      email: email,
+      password: password,
+    );
 
     debugPrint(name);
     debugPrint(password);
@@ -59,16 +62,27 @@ class Requester {
     }
   }
 
-  Future<List<Video>> topRequester() async {
+  Future<List<Video>> topRequester({String? searchQuery}) async {
     var accessToken = await storage.read(key: "accessToken");
     headers["Authorization"] = "Token $accessToken";
 
     debugPrint("send topRequester");
-    final response = await http.get(topUri(), headers: headers);
+
+    Uri uri;
+    if (searchQuery != null) {
+      uri = topUri().replace(queryParameters: {"search_query": searchQuery});
+    } else {
+      uri = topUri();
+    }
+
+    final response = await http.get(uri, headers: headers);
 
     if (response.statusCode == 200) {
-      final decoded = json.decode(utf8.decode(response.bodyBytes)).cast<Map<String, dynamic>>();
-      List<Video> videoList = decoded.map<Video>((json) => Video.fromJson(json)).toList();
+      final decoded = json
+          .decode(utf8.decode(response.bodyBytes))
+          .cast<Map<String, dynamic>>();
+      List<Video> videoList =
+          decoded.map<Video>((json) => Video.fromJson(json)).toList();
       return videoList;
     } else {
       throw Exception("Top Error");
@@ -83,8 +97,12 @@ class Requester {
     final response = await http.get(indexUri(videoId), headers: headers);
 
     if (response.statusCode == 200) {
-      List<Map<String, dynamic>> decoded = await json.decode(utf8.decode(response.bodyBytes)).cast<Map<String, dynamic>>();
-      List<Map<String,String>> headlines = decoded.map<Map<String,String>>((json) => json.cast<String, String>()).toList();
+      List<Map<String, dynamic>> decoded = await json
+          .decode(utf8.decode(response.bodyBytes))
+          .cast<Map<String, dynamic>>();
+      List<Map<String, String>> headlines = decoded
+          .map<Map<String, String>>((json) => json.cast<String, String>())
+          .toList();
       return headlines;
     } else {
       throw Exception("headline(index) Error");
@@ -113,13 +131,10 @@ class Requester {
   }
 }
 
-
-
-
 class HelloResponse {
   final message;
 
-  HelloResponse.fromJson(Map<String, dynamic> json) 
+  HelloResponse.fromJson(Map<String, dynamic> json)
       : message = json['username'];
 }
 
@@ -149,7 +164,6 @@ class RegisterRequest {
         'email': email,
       };
 }
-
 
 class AuthResponse {
   final String accessToken;

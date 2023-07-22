@@ -14,34 +14,56 @@ class TopPage extends StatefulWidget {
 }
 
 class _TopPageState extends State<TopPage> {
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context, listen: false);
-    Requester().topRequester().then((value) {
-      videoNotifier.set(value);
-    }).onError((error, stackTrace) {
+    VideoNotifier videoNotifier =
+        Provider.of<VideoNotifier>(context, listen: false);
+    _fetchDataFromEndpoint(); // 初期データの取得
+  }
+
+  // エンドポイントにアクセスしてデータを取得する非同期処理
+  Future<void> _fetchDataFromEndpoint({String? searchQuery}) async {
+    try {
+      List<Video> videos =
+          await Requester().topRequester(searchQuery: searchQuery);
+      VideoNotifier videoNotifier =
+          Provider.of<VideoNotifier>(context, listen: false);
+      videoNotifier.set(videos);
+    } catch (error) {
+      // エラーハンドリング
       showDialog(
-          context: context,
-          builder: (_) {
-            return AlertDialog(
-              title: const Text("データの取得に失敗しました。"),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context), child: const Text("OK")),
-              ],
-            );
-          }).then((_) {
-        Navigator.pop(context);
-      });
-    });
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: const Text("データの取得に失敗しました。"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _onSearchPressed() {
+    String searchQuery = searchController.text;
+    _fetchDataFromEndpoint(searchQuery: searchQuery); // 検索クエリを渡して再描画
+  }
+
+  void _onSearchSubmitted(String searchQuery) {
+    _fetchDataFromEndpoint(searchQuery: searchQuery); // 検索クエリを渡して再描画
   }
 
   @override
   Widget build(BuildContext context) {
     VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Youtube.txt"),
@@ -50,15 +72,20 @@ class _TopPageState extends State<TopPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(16),
               child: TextField(
-                decoration: InputDecoration(prefixIcon: Icon(Icons.search)),
+                controller: searchController,
+                onSubmitted: _onSearchSubmitted,
+                decoration: InputDecoration(
+                  prefixIcon: InkWell(
+                    onTap: _onSearchPressed, // 検索ボタンが押されたら再描画
+                    child: const Icon(Icons.search),
+                  ),
+                ),
               ),
             ),
-            VideoList(
-              videoNotifier.videoTiles
-            )
+            VideoList(videoNotifier.videoTiles),
           ],
         ),
       ),
