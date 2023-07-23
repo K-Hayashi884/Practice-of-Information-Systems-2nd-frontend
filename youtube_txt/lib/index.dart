@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_txt/model/video.dart';
 import 'package:youtube_txt/widget/drawer_menu.dart';
 import 'package:provider/provider.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class IndexPage extends StatelessWidget {
   const IndexPage({super.key});
@@ -18,15 +19,35 @@ class IndexPage extends StatelessWidget {
     ];
     debugPrint(video.indices.toString());
 
+    // final _controller = YoutubePlayerController(
+    //   params: YoutubePlayerParams(
+    //     mute: false,
+    //     showControls: true,
+    //     showFullscreenButton: false,
+    //   ),
+    // );
+
+    final _controller = YoutubePlayerController.fromVideoId(
+      videoId: video_route.id,
+      autoPlay: false,
+      params: const YoutubePlayerParams(showFullscreenButton: true),
+    );
+
     final List<Widget> thumbnailItems = [
       Padding(
         padding: const EdgeInsets.only(top: 16.0),
         child: SizedBox(
             width: deviceWidth * 0.8,
             child: Center(
-                child: video.imageUrl != null
-                    ? SizedBox(width: deviceWidth * 0.9, child: Image.network(video.imageUrl))
-                    : Image.asset("images/dummy_thumbnail.png"))),
+              child:YoutubePlayer(
+                controller: _controller,
+                aspectRatio: 16 / 9,
+              )
+                // child: video.imageUrl != null
+                //     ? SizedBox(width: deviceWidth * 0.9, child: Image.network(video.imageUrl))
+                //     : Image.asset("images/dummy_thumbnail.png")
+            )
+        ),
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 8.0),
