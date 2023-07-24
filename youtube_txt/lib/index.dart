@@ -23,197 +23,212 @@ class _IndexPageState extends State<IndexPage> {
     VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context);
     final videoRoute = ModalRoute.of(context)!.settings.arguments as Video;
     final deviceWidth = MediaQuery.of(context).size.width;
-    var video = videoNotifier.videos[videoNotifier.getId(videoRoute.id)];
-    debugPrint(video.indices.toString());
+    try {
+      var video = videoNotifier.videos[videoNotifier.getId(videoRoute.id)];
+      debugPrint(video.indices.toString());
 
-    // final _controller = YoutubePlayerController(
-    //   params: YoutubePlayerParams(
-    //     mute: false,
-    //     showControls: true,
-    //     showFullscreenButton: false,
-    //   ),
-    // );
+      // final _controller = YoutubePlayerController(
+      //   params: YoutubePlayerParams(
+      //     mute: false,
+      //     showControls: true,
+      //     showFullscreenButton: false,
+      //   ),
+      // );
 
-    var _controller = YoutubePlayerController.fromVideoId(
-      videoId: video_route.id,
-      autoPlay: true,
-      params: const YoutubePlayerParams(showFullscreenButton: true),
-    );
+      var _controller = YoutubePlayerController.fromVideoId(
+        videoId: videoRoute.id,
+        autoPlay: true,
+        params: const YoutubePlayerParams(showFullscreenButton: true),
+      );
 
-    double parseHHMMSS(String time) {
-      List<String> parts = time.split(':');
-      int hours = 0;
-      int minutes;
-      int seconds;
+      double parseHHMMSS(String time) {
+        List<String> parts = time.split(':');
+        int hours = 0;
+        int minutes;
+        int seconds;
 
-      if (parts.length == 3) {
-        // HH:MM:SS 形式の場合
-        hours = int.parse(parts[0]);
-        minutes = int.parse(parts[1]);
-        seconds = int.parse(parts[2]);
-      } else if (parts.length == 2) {
-        // MM:SS 形式の場合
-        minutes = int.parse(parts[0]);
-        seconds = int.parse(parts[1]);
-      } else {
-        throw const FormatException(
-            "Invalid time format. Supported formats: HH:MM:SS or MM:SS");
+        if (parts.length == 3) {
+          // HH:MM:SS 形式の場合
+          hours = int.parse(parts[0]);
+          minutes = int.parse(parts[1]);
+          seconds = int.parse(parts[2]);
+        } else if (parts.length == 2) {
+          // MM:SS 形式の場合
+          minutes = int.parse(parts[0]);
+          seconds = int.parse(parts[1]);
+        } else {
+          throw const FormatException(
+              "Invalid time format. Supported formats: HH:MM:SS or MM:SS");
+        }
+
+        return (hours * 3600 + minutes * 60 + seconds).toDouble();
       }
 
-      return (hours * 3600 + minutes * 60 + seconds).toDouble();
-    }
-
-    final List<Widget> thumbnailItems = [
-      Padding(
-        padding: const EdgeInsets.only(top: 16.0),
-        child: SizedBox(
-          width: deviceWidth * 0.8,
-          child: Center(
-            child: YoutubePlayer(
-              controller: _controller,
-              aspectRatio: 16 / 9,
+      final List<Widget> thumbnailItems = [
+        Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: SizedBox(
+            width: deviceWidth * 0.8,
+            child: Center(
+              child: YoutubePlayer(
+                controller: _controller,
+                aspectRatio: 16 / 9,
+              ),
             ),
           ),
         ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: SizedBox(
-          width: deviceWidth * 0.9,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            mainAxisSize: MainAxisSize.min,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: SizedBox(
+            width: deviceWidth * 0.9,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                    width: deviceWidth * 0.4,
+                    child: Text(
+                      video.title,
+                      style: const TextStyle(
+                          fontSize: 17, fontWeight: FontWeight.w500),
+                      overflow: TextOverflow.ellipsis,
+                    )),
+                OutlinedButton(
+                    onPressed: () {
+                      Requester().laterAddRequester(videoRoute.id).then((_) {
+                        showDialog(
+                          context: context,
+                          builder: (_) {
+                            return AlertDialog(
+                              title: const Text("追加しました"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text("OK"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }).onError((error, stackTrace) {
+                        showDialog(
+                          context: context,
+                          builder: (_) {
+                            return AlertDialog(
+                              title: Text(error.toString()),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text("OK"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      });
+                    },
+                    child: const Text("あとで見る")),
+              ],
+            ),
+          ),
+        ),
+      ];
+
+      final List<Widget> indicesList = [];
+      if (video.indices != null) {
+        for (Map<String, String> indice in video.indices!) {
+          indicesList.add(Row(
             children: [
               SizedBox(
-                  width: deviceWidth * 0.4,
-                  child: Text(
-                    video.title,
-                    style: const TextStyle(
-                        fontSize: 17, fontWeight: FontWeight.w500),
-                    overflow: TextOverflow.ellipsis,
-                  )),
-              OutlinedButton(
+                width: deviceWidth * 0.3,
+                height: 35,
+                child: TextButton(
                   onPressed: () {
-                    Requester().laterAddRequester(videoRoute.id).then((_) {
-                      showDialog(
-                        context: context,
-                        builder: (_) {
-                          return AlertDialog(
-                            title: const Text("追加しました"),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text("OK"),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }).onError((error, stackTrace) {
-                      showDialog(
-                        context: context,
-                        builder: (_) {
-                          return AlertDialog(
-                            title: Text(error.toString()),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text("OK"),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    });
+                    debugPrint("onPressed");
+                    String? timestamp = indice["timestamp"];
+                    double timeFloat = timestamp != null
+                        ? parseHHMMSS(timestamp)
+                        : 0; // タイムスタンプがnullの場合は0秒をデフォルトとする
+                    _controller.seekTo(
+                        seconds: timeFloat); // seekToにはDurationを使用
                   },
-                  child: const Text("あとで見る")),
-            ],
-          ),
-        ),
-      ),
-    ];
-
-    final List<Widget> indicesList = [];
-    if (video.indices != null) {
-      for (Map<String, String> indice in video.indices!) {
-        indicesList.add(Row(
-          children: [
-            SizedBox(
-              width: deviceWidth * 0.3,
-              height: 35,
-              child: TextButton(
-                onPressed: () {
-                  debugPrint("onPressed");
-                  String? timestamp = indice["timestamp"];
-                  double timeFloat = timestamp != null
-                      ? parseHHMMSS(timestamp)
-                      : 0; // タイムスタンプがnullの場合は0秒をデフォルトとする
-                  _controller.seekTo(seconds: timeFloat); // seekToにはDurationを使用
-                },
-                child: Text(indice["timestamp"]!),
-              ),
-            ),
-            SizedBox(
-              width: deviceWidth * 0.6,
-              child: Text(
-                indice["headline"]!,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ));
-      }
-      indicesList.add(const SizedBox(
-        height: 16,
-      ));
-    }
-
-    final List<Widget> commentsList = [];
-    if (video.comments != null) {
-      commentsList.add(
-        Container(
-          width: deviceWidth,
-          alignment: Alignment.center,
-          child: Container(
-            padding: const EdgeInsets.only(bottom: 12),
-            width: deviceWidth * 0.9,
-            child: const Text("コメントからのおすすめ"),
-          ),
-        ),
-      );
-      for (String comment in video.comments!) {
-        commentsList.add(
-          Container(
-            padding: const EdgeInsets.only(bottom: 12),
-            width: deviceWidth,
-            alignment: Alignment.center,
-            child: Flexible(
-              child: SizedBox(
-                width: deviceWidth * 0.8,
-                child: Text(
-                  comment,
-                  textAlign: TextAlign.start,
+                  child: Text(indice["timestamp"]!),
                 ),
               ),
+              SizedBox(
+                width: deviceWidth * 0.6,
+                child: Text(
+                  indice["headline"]!,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ));
+        }
+        indicesList.add(const SizedBox(
+          height: 16,
+        ));
+      }
+
+      final List<Widget> commentsList = [];
+      if (video.comments != null) {
+        commentsList.add(
+          Container(
+            width: deviceWidth,
+            alignment: Alignment.center,
+            child: Container(
+              padding: const EdgeInsets.only(bottom: 12),
+              width: deviceWidth * 0.9,
+              child: const Text("コメントからのおすすめ"),
             ),
           ),
         );
+        for (String comment in video.comments!) {
+          commentsList.add(
+            Container(
+              padding: const EdgeInsets.only(bottom: 12),
+              width: deviceWidth,
+              alignment: Alignment.center,
+              child: Flexible(
+                child: SizedBox(
+                  width: deviceWidth * 0.8,
+                  child: Text(
+                    comment,
+                    textAlign: TextAlign.start,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+        commentsList.add(const SizedBox(
+          height: 12,
+        ));
       }
-      commentsList.add(const SizedBox(
-        height: 12,
-      ));
-    }
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("Youtube.txt")),
-      endDrawer: const DrawerMenu(),
-      body: CustomScrollView(
-        slivers: [
-          SliverList(delegate: SliverChildListDelegate(thumbnailItems)),
-          SliverList(delegate: SliverChildListDelegate(indicesList)),
-          SliverList(delegate: SliverChildListDelegate(commentsList)),
-        ],
-      ),
-    );
+      return Scaffold(
+        appBar: AppBar(title: const Text("Youtube.txt")),
+        endDrawer: const DrawerMenu(),
+        body: CustomScrollView(
+          slivers: [
+            SliverList(delegate: SliverChildListDelegate(thumbnailItems)),
+            SliverList(delegate: SliverChildListDelegate(indicesList)),
+            SliverList(delegate: SliverChildListDelegate(commentsList)),
+          ],
+        ),
+      );
+    } catch (e) {
+      // エラーが発生した場合は"later"への画面遷移を返す
+      return FutureBuilder(
+        future: Navigator.pushReplacementNamed(context, "later"),
+        builder: (context, snapshot) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        },
+      );
+    }
   }
 }
