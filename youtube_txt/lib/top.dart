@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_txt/widget/drawer_menu.dart';
+import 'package:youtube_txt/widget/video_list.dart';
+
+import 'model/video.dart';
 
 class TopPage extends StatefulWidget {
   const TopPage({super.key});
@@ -16,6 +20,7 @@ class _TopPageState extends State<TopPage> {
       appBar: AppBar(
         title: const Text("Youtube.txt"),
       ),
+      endDrawer: const DrawerMenu(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -23,20 +28,39 @@ class _TopPageState extends State<TopPage> {
               padding: EdgeInsets.all(16),
               child: TextField(
                 decoration: InputDecoration(prefixIcon: Icon(Icons.search)),
-                // onChanged: (value) {
-                //   setState(() {
-                //     _text = value;
-                //   });
-                // },
               ),
             ),
             VideoList([
-              VideoListTile(
-                  Image.asset("images/dummy_thumbnail.png"), "おすすめ動画１"),
-              VideoListTile(
-                  Image.asset("images/dummy_thumbnail.png"), "おすすめ動画２"),
-              VideoListTile(
-                  Image.asset("images/dummy_thumbnail.png"), "おすすめ動画３"),
+              VideoListTile(Video(
+                url: "www.google.com",
+                title:
+                    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+                image: Image.asset("images/dummy_thumbnail.png"),
+                indices: [
+                  {"timestamp": "0:20", "headline": "オープニング"},
+                  {"timestamp": "10:33", "headline": "議題１"},
+                ],
+                comments: [
+                  "12:34 ここ好き",
+                  "56:78 ここ好き",
+                  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+                  "a",
+                  "b",
+                  "c",
+                  "d",
+                  "e"
+                ],
+              )),
+              VideoListTile(Video(
+                url: "www.google.com",
+                title: "おすすめ動画２",
+                image: Image.asset("images/dummy_thumbnail.png"),
+              )),
+              VideoListTile(Video(
+                url: "www.google.com",
+                title: "おすすめ動画３",
+                image: Image.asset("images/dummy_thumbnail.png"),
+              )),
             ])
           ],
         ),
@@ -66,21 +90,6 @@ class VideoList extends StatelessWidget {
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-    );
-  }
-}
-
-class VideoListTile extends StatelessWidget {
-  final Image image;
-  final String title;
-
-  const VideoListTile(this.image, this.title, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Container(height: 120, child: image),
-      title: Text(title),
     );
   }
 }
