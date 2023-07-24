@@ -110,6 +110,42 @@ class Requester {
     }
   }
 
+  Future<void> laterAddRequester(videoId) async {
+    var accessToken = await storage.read(key: "accessToken");
+    headers["Authorization"] = "Token $accessToken";
+
+    debugPrint("send later Add Requester");
+    debugPrint(videoId.toString());
+
+    final response = await http.post(laterListUri(),body: json.encode({"video_id":videoId}), headers: headers);
+
+    if (response.statusCode == 200) {
+      debugPrint("add success");
+    } else if(response.statusCode == 406){
+      throw Exception("already added");
+    }else{
+      throw Exception("later add Error");
+    }
+  }
+
+  Future<void> laterDeleteRequester(videoId) async {
+    var accessToken = await storage.read(key: "accessToken");
+    headers["Authorization"] = "Token $accessToken";
+
+    debugPrint("send later delete Requester");
+    debugPrint(videoId.toString());
+
+    Uri uri = laterListUri().replace(queryParameters: {"video_id": videoId});
+
+    final response = await http.delete(uri, headers: headers);
+
+    if (response.statusCode == 200) {
+      debugPrint("delete success");
+    } else {
+      throw Exception("later delete Error");
+    }
+  }
+
   Future<List<Map<String, String>>> headlineRequester(videoId) async {
     var accessToken = await storage.read(key: "accessToken");
     headers["Authorization"] = "Token $accessToken";
@@ -130,33 +166,9 @@ class Requester {
     }
   }
 
-  Future<String> helloRequester() async {
-    var helloUri = uri + "api/v1/account/1/";
-    var accessToken = await storage.read(key: "accessToken");
-    headers["Authorization"] = "Token $accessToken";
-
-    debugPrint("send helloRequester");
-    final response = await http.get(Uri.parse(helloUri), headers: headers);
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> decoded = json.decode(response.body);
-      var helloResponse = HelloResponse.fromJson(decoded);
-      return helloResponse.message;
-    } else {
-      throw Exception("Hello Error");
-    }
-  }
-
   Future<void> logoutRequester() async {
     await storage.delete(key: "accessToken");
   }
-}
-
-class HelloResponse {
-  final message;
-
-  HelloResponse.fromJson(Map<String, dynamic> json)
-      : message = json['username'];
 }
 
 class RegisterResponse {

@@ -31,12 +31,3 @@ Uri indexUri(String video_id) {
 Uri laterListUri() {
   return Uri.parse('$baseUri/list/');
 }
-
-Uri addLaterListUri(int user_id) {
-  return Uri.parse('$baseUri/list/$user_id/post/');
-}
-
-Uri deleteLaterListUri(int user_id) {
-  return Uri.parse('$baseUri/list/$user_id/delete/');
-}
-// }

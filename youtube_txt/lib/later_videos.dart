@@ -68,10 +68,67 @@ class _LaterVideosPageState extends State<LaterVideosPage> {
   }
 }
 
+// class LaterVideoListTile extends VideoListTile {
+//   final Video video;
+//   LaterVideoListTile(this.video, {Key? key}) : super(video, key: key);
+//   // LaterVideoListTile(super.video, {super.key});
+
+//   @override
+//   final Widget? trailing =
+//       IconButton(
+//         onPressed: () {
+//           Requester().laterDeleteRequester(video.id);
+//         },
+//         icon: const Icon(Icons.delete)
+//       );
+// }
+
+// class LaterVideoListTile extends VideoListTile {
+//   final Video video;
+
+//   LaterVideoListTile(this.video, {Key? key}) : super(video, key: key) {
+//     trailing = IconButton(
+//       onPressed: () {
+//         try{
+//           Requester().laterDeleteRequester(video.id);
+//         }catch(error){
+//         }
+//       },
+//       icon: const Icon(Icons.delete),
+//     );
+//   }
+
+//   Widget? trailing;
+// }
+
 class LaterVideoListTile extends VideoListTile {
-  LaterVideoListTile(super.video, {super.key});
+  final video;
+  const LaterVideoListTile(this.video, {Key? key}) : super(video, key: key);
 
   @override
-  final Widget? trailing =
-      IconButton(onPressed: () {}, icon: const Icon(Icons.delete));
+  Widget build(BuildContext context) {
+    VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context);
+    return ListTile(
+      leading: SizedBox(height: 120, child: Image.network(video.imageUrl)),
+      title: Text(
+        video.title,
+        overflow: TextOverflow.ellipsis,
+      ),
+      onTap: () {
+        videoNotifier.setIndex(video.id);
+        Navigator.pushNamed(context, "index", arguments: video);
+      },
+      trailing: IconButton(
+        onPressed: () {
+          try{
+            Requester().laterDeleteRequester(video.id);
+            videoNotifier.remove(video.id);
+          }catch(error){
+            debugPrint(error.toString());
+          }
+        },
+        icon: const Icon(Icons.delete)
+      ),
+    );
+  }
 }

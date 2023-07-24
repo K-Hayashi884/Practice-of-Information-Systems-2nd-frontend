@@ -5,7 +5,6 @@ import 'package:youtube_txt/requester/requester.dart';
 
 class VideoNotifier extends ChangeNotifier {
   List<Video> _videos = [];
-  //int _frag = 0;
 
   List<VideoListTile> get videoTiles{
     List<VideoListTile> videoTiles = [];
@@ -18,8 +17,7 @@ class VideoNotifier extends ChangeNotifier {
   List<LaterVideoListTile> get laterVideoListTiles{
     List<LaterVideoListTile> laterList = [];
     for(var video in _videos){
-      videoTiles.add(LaterVideoListTile(video));
-      debugPrint("make list");
+      laterList.add(LaterVideoListTile(video));
     }
     return laterList;
   }
@@ -27,26 +25,13 @@ class VideoNotifier extends ChangeNotifier {
   List<Video> get videos => _videos;
 
   void set(List<Video> videos) {
-    //if(_frag == 0){
-      _videos = videos;
-      //_frag = 1;
-      notifyListeners();
-    //}
+    _videos = videos;
+    notifyListeners();
   }
 
   int getId(videoId){
     return _videos.indexWhere((element) => element.id == videoId);
   }
-
-  // List<Map<String, String>> headline(videoId){
-  //   List<Map<String, String>> test = [];
-  //   Requester().headlineRequester(videoId).then((value) {
-  //     List<Map<String, String>> test = value;
-  //   }).onError((error, stackTrace) {
-  //       debugPrint("getheadlineError");
-  //   });
-  //   return test;
-  // }
 
   void setIndex(videoId){
     int id = getId(videoId);
@@ -59,6 +44,14 @@ class VideoNotifier extends ChangeNotifier {
       }).onError((error, stackTrace) {
         debugPrint("getheadlineError");
       });
+    }
+  }
+
+  void remove(videoId){
+    int id =getId(videoId);
+    if(id != -1){
+      _videos.removeAt(id);
+      notifyListeners();
     }
   }
 }

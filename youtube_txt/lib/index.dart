@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_txt/model/video.dart';
 import 'package:youtube_txt/widget/drawer_menu.dart';
 import 'package:provider/provider.dart';
+import 'package:youtube_txt/requester/requester.dart';
 
 class IndexPage extends StatelessWidget {
   const IndexPage({super.key});
@@ -9,11 +10,11 @@ class IndexPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context);
-    final video_route = ModalRoute.of(context)!.settings.arguments as Video;
+    final videoRoute = ModalRoute.of(context)!.settings.arguments as Video;
     final deviceWidth = MediaQuery.of(context).size.width;
     var video = videoNotifier.videos[
       videoNotifier.getId(
-        video_route.id
+        videoRoute.id
         )
     ];
     debugPrint(video.indices.toString());
@@ -44,7 +45,42 @@ class IndexPage extends StatelessWidget {
                         fontSize: 17, fontWeight: FontWeight.w500),
                     overflow: TextOverflow.ellipsis,
                   )),
-              OutlinedButton(onPressed: () {}, child: const Text("あとで見る")),
+              OutlinedButton(onPressed: () {
+                Requester()
+                .laterAddRequester(videoRoute.id)
+                .then((_) {
+                  showDialog(
+                    context: context,
+                    builder: (_) {
+                      return AlertDialog(
+                        title: const Text("追加しました"),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }).onError((error, stackTrace){ 
+                  showDialog(
+                    context: context,
+                    builder: (_) {
+                      return AlertDialog(
+                        title: Text(error.toString()),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                });
+              },
+              child: const Text("あとで見る")),
             ],
           ),
         ),
