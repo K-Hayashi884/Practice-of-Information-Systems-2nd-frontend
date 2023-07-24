@@ -33,6 +33,29 @@ class IndexPage extends StatelessWidget {
       params: const YoutubePlayerParams(showFullscreenButton: true),
     );
 
+    double parseHHMMSS(String time) {
+    List<String> parts = time.split(':');
+    int hours = 0;
+    int minutes;
+    int seconds;
+
+    if (parts.length == 3) {
+      // HH:MM:SS 形式の場合
+      hours = int.parse(parts[0]);
+      minutes = int.parse(parts[1]);
+      seconds = int.parse(parts[2]);
+    } else if (parts.length == 2) {
+      // MM:SS 形式の場合
+      minutes = int.parse(parts[0]);
+      seconds = int.parse(parts[1]);
+    } else {
+      throw const FormatException(
+          "Invalid time format. Supported formats: HH:MM:SS or MM:SS");
+    }
+
+    return (hours * 3600 + minutes * 60 + seconds).toDouble();
+  }
+
     final List<Widget> thumbnailItems = [
       Padding(
         padding: const EdgeInsets.only(top: 16.0),
@@ -81,7 +104,16 @@ class IndexPage extends StatelessWidget {
             height: 35,
             child: TextButton(
               onPressed: () {},
+              child: TextButton(
+              onPressed: () {
+                String? timestamp = indice["timestamp"];
+                double timeFloat = timestamp != null
+                    ? parseHHMMSS(timestamp)
+                    : 0; // Set a default time of 0 seconds if timestamp is null
+                _controller.seekTo(seconds: timeFloat);
+              },
               child: Text(indice["timestamp"]!),
+            ),
             ),
           ),
           SizedBox(
