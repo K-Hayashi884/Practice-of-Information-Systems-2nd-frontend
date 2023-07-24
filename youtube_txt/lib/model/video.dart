@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_txt/widget/video_list.dart';
+import 'package:youtube_txt/later_videos.dart';
 import 'package:youtube_txt/requester/requester.dart';
 
 class VideoNotifier extends ChangeNotifier {
@@ -12,7 +13,16 @@ class VideoNotifier extends ChangeNotifier {
       videoTiles.add(VideoListTile(video));
     }
     return videoTiles;
-  } 
+  }
+
+  List<LaterVideoListTile> get laterVideoListTiles{
+    List<LaterVideoListTile> laterList = [];
+    for(var video in _videos){
+      videoTiles.add(LaterVideoListTile(video));
+      debugPrint("make list");
+    }
+    return laterList;
+  }
 
   List<Video> get videos => _videos;
 

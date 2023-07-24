@@ -28,8 +28,8 @@ Uri indexUri(String video_id) {
   return Uri.parse('$baseUri/index/$video_id/');
 }
 
-Uri laterListUri(int user_id) {
-  return Uri.parse('$baseUri/list/$user_id/');
+Uri laterListUri() {
+  return Uri.parse('$baseUri/list/');
 }
 
 Uri addLaterListUri(int user_id) {

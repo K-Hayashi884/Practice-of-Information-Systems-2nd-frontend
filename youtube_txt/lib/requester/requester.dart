@@ -89,6 +89,27 @@ class Requester {
     }
   }
 
+  Future<List<Video>> laterGetRequester() async {
+    var accessToken = await storage.read(key: "accessToken");
+    headers["Authorization"] = "Token $accessToken";
+
+    debugPrint("send later Get Requester");
+
+    final response = await http.get(laterListUri(), headers: headers);
+
+    if (response.statusCode == 200) {
+      final decoded = json
+          .decode(utf8.decode(response.bodyBytes))
+          .cast<Map<String, dynamic>>();
+      List<Video> videoList =
+          decoded.map<Video>((json) => Video.fromJson(json)).toList();
+      debugPrint(videoList.toString());
+      return videoList;
+    } else {
+      throw Exception("later get Error");
+    }
+  }
+
   Future<List<Map<String, String>>> headlineRequester(videoId) async {
     var accessToken = await storage.read(key: "accessToken");
     headers["Authorization"] = "Token $accessToken";

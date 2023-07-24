@@ -24,9 +24,9 @@ class IndexPage extends StatelessWidget {
         child: SizedBox(
             width: deviceWidth * 0.8,
             child: Center(
-                child: video.imageUrl != null
-                    ? SizedBox(width: deviceWidth * 0.9, child: Image.network(video.imageUrl))
-                    : Image.asset("images/dummy_thumbnail.png"))),
+                child: SizedBox(width: deviceWidth * 0.9, child: Image.network(video.imageUrl))
+            )
+        )
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 8.0),

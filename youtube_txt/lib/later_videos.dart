@@ -3,50 +3,66 @@ import 'package:youtube_txt/widget/drawer_menu.dart';
 import 'package:youtube_txt/widget/video_list.dart';
 
 import 'model/video.dart';
+import 'package:provider/provider.dart';
+import 'package:youtube_txt/requester/requester.dart';
 
-class LaterVideosPage extends StatelessWidget {
+class LaterVideosPage extends StatefulWidget {
   const LaterVideosPage({super.key});
 
   @override
+  State<LaterVideosPage> createState() => _LaterVideosPageState();
+}
+
+class _LaterVideosPageState extends State<LaterVideosPage> {
+
+  @override
+  void initState() {
+    super.initState();
+    VideoNotifier videoNotifier =
+        Provider.of<VideoNotifier>(context, listen: false);
+    _fetchDataFromEndpoint(); // 初期データの取得
+  }
+
+  Future<void> _fetchDataFromEndpoint() async {
+    try {
+      List<Video> videos =
+          await Requester().laterGetRequester();
+      VideoNotifier videoNotifier =
+          Provider.of<VideoNotifier>(context, listen: false);
+      videoNotifier.set(videos);
+    } catch (error) {
+      // エラーハンドリング
+      showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: const Text("データの取得に失敗しました。"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Youtube.txt"),
       ),
       endDrawer: const DrawerMenu(),
       body: SingleChildScrollView(
-        child: VideoList([
-          LaterVideoListTile(Video(
-            url: "www.google.com",
-            title:
-                "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-            imageUrl: "https://i.ytimg.com/vi/XOkUJYVALQE/default.jpg",
-            indices: [
-              {"timestamp": "0:20", "headline": "オープニング"},
-              {"timestamp": "10:33", "headline": "議題１"},
-            ],
-            comments: [
-              "12:34 ここ好き",
-              "56:78 ここ好き",
-              "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-              "a",
-              "b",
-              "c",
-              "d",
-              "e"
-            ],
-          )),
-          LaterVideoListTile(Video(
-            url: "www.google.com",
-            title: "おすすめ動画２",
-            imageUrl: "https://i.ytimg.com/vi/XOkUJYVALQE/default.jpg",
-          )),
-          LaterVideoListTile(Video(
-            url: "www.google.com",
-            title: "おすすめ動画３",
-            imageUrl: "https://i.ytimg.com/vi/XOkUJYVALQE/default.jpg",
-          )),
-        ]),
+        child: VideoList(
+            videoNotifier.laterVideoListTiles
+        )
       ),
     );
   }
