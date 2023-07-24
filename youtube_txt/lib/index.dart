@@ -12,11 +12,10 @@ class IndexPage extends StatelessWidget {
     VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context);
     final videoRoute = ModalRoute.of(context)!.settings.arguments as Video;
     final deviceWidth = MediaQuery.of(context).size.width;
-    var video = videoNotifier.videos[
-      videoNotifier.getId(
-        videoRoute.id
-        )
-    ];
+    var video = videoRoute;
+    if(videoNotifier.getId(videoRoute.id) != -1){
+      video = videoNotifier.videos[videoNotifier.getId(videoRoute.id)];
+    }
     debugPrint(video.indices.toString());
 
     final List<Widget> thumbnailItems = [
