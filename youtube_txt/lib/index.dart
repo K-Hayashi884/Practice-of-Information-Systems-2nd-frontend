@@ -12,18 +12,37 @@ class IndexPage extends StatefulWidget {
 }
 
 class _IndexPageState extends State<IndexPage> {
+  late YoutubePlayerController _controller;
+
   @override
   void initState() {
     super.initState();
+    _controller = YoutubePlayerController(
+      params: const YoutubePlayerParams(
+        showControls: true,
+        mute: false,
+        showFullscreenButton: false,
+        loop: false,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("build index");
     VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context);
     final video_route = ModalRoute.of(context)!.settings.arguments as Video;
     final deviceWidth = MediaQuery.of(context).size.width;
     var video = videoNotifier.videos[videoNotifier.getId(video_route.id)];
     debugPrint(video.indices.toString());
+
+    _controller.cueVideoById(videoId: video_route.id);
 
     // final _controller = YoutubePlayerController(
     //   params: YoutubePlayerParams(
@@ -33,11 +52,11 @@ class _IndexPageState extends State<IndexPage> {
     //   ),
     // );
 
-    var _controller = YoutubePlayerController.fromVideoId(
-      videoId: video_route.id,
-      autoPlay: true,
-      params: const YoutubePlayerParams(showFullscreenButton: true),
-    );
+    // final _controller = YoutubePlayerController.fromVideoId(
+    //   videoId: video_route.id,
+    //   autoPlay: false,
+    //   params: const YoutubePlayerParams(showFullscreenButton: true),
+    // );
 
     double parseHHMMSS(String time) {
       List<String> parts = time.split(':');
@@ -107,32 +126,31 @@ class _IndexPageState extends State<IndexPage> {
     final List<Widget> indicesList = [];
     if (video.indices != null) {
       for (Map<String, String> indice in video.indices!) {
-        indicesList.add(Row(
-          children: [
-            SizedBox(
-              width: deviceWidth * 0.3,
-              height: 35,
-              child: TextButton(
-                onPressed: () {
-                  debugPrint("onPressed");
-                  String? timestamp = indice["timestamp"];
-                  double timeFloat = timestamp != null
-                      ? parseHHMMSS(timestamp)
-                      : 0; // タイムスタンプがnullの場合は0秒をデフォルトとする
-                  _controller.seekTo(seconds: timeFloat); // seekToにはDurationを使用
-                },
-                child: Text(indice["timestamp"]!),
-              ),
+        indicesList.add(Row(children: [
+          SizedBox(
+            width: deviceWidth * 0.3,
+            height: 35,
+            child: TextButton(
+              onPressed: () {
+                String? timestamp = indice["timestamp"];
+                double timeFloat = timestamp != null
+                    ? parseHHMMSS(timestamp)
+                    : 0; // Set a default time of 0 seconds if timestamp is null
+                _controller.seekTo(seconds: timeFloat, allowSeekAhead: true);
+                var playerState = _controller.playerState;
+                debugPrint(playerState.hashCode.toString());
+              },
+              child: Text(indice["timestamp"]!),
             ),
-            SizedBox(
-              width: deviceWidth * 0.6,
-              child: Text(
-                indice["headline"]!,
-                overflow: TextOverflow.ellipsis,
-              ),
+          ),
+          SizedBox(
+            width: deviceWidth * 0.6,
+            child: Text(
+              indice["headline"]!,
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ));
+          )
+        ]));
       }
       indicesList.add(const SizedBox(
         height: 16,
