@@ -42,3 +42,22 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+# Firebase関連のファイル
+/android/app/google-services.json
+/ios/Runner/GoogleService-Info.plist
+/ios/firebase_app_id_file.json
+/lib/firebase_options.dart
+/macos/Runner/GoogleService-Info.plist
+/macos/firebase_app_id_file.json
+
+# Flutterプロジェクト関連のファイル
+/ios/Podfile
+/macos/Podfile
+
+# ビルドやプラグイン生成に関連するファイル
+/android/app/build/
+/ios/Pods/
+/macos/Pods/
+/windows/flutter/
