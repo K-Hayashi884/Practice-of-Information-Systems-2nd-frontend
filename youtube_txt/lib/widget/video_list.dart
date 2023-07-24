@@ -42,7 +42,9 @@ class VideoListTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       onTap: () {
-        videoNotifier.setIndex(video.id);
+        if(video.indices == null){
+          videoNotifier.setIndex(video.id);
+        }
         Navigator.pushNamed(context, "index", arguments: video);
       },
       trailing: trailing,
