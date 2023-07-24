@@ -63,7 +63,7 @@ class Video {
       this.title = "",
       this.count = 0,
       this.imageUrl = "",
-      this.indices,
+      this.indices = const [{"timestamp":"0:00","headline":"取得中..."}],
       this.comments});
 
   final String url;
