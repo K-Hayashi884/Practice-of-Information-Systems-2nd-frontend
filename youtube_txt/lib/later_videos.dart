@@ -18,8 +18,6 @@ class _LaterVideosPageState extends State<LaterVideosPage> {
   @override
   void initState() {
     super.initState();
-    VideoNotifier videoNotifier =
-        Provider.of<VideoNotifier>(context, listen: false);
     _fetchDataFromEndpoint(); // 初期データの取得
   }
 
@@ -67,39 +65,6 @@ class _LaterVideosPageState extends State<LaterVideosPage> {
     );
   }
 }
-
-// class LaterVideoListTile extends VideoListTile {
-//   final Video video;
-//   LaterVideoListTile(this.video, {Key? key}) : super(video, key: key);
-//   // LaterVideoListTile(super.video, {super.key});
-
-//   @override
-//   final Widget? trailing =
-//       IconButton(
-//         onPressed: () {
-//           Requester().laterDeleteRequester(video.id);
-//         },
-//         icon: const Icon(Icons.delete)
-//       );
-// }
-
-// class LaterVideoListTile extends VideoListTile {
-//   final Video video;
-
-//   LaterVideoListTile(this.video, {Key? key}) : super(video, key: key) {
-//     trailing = IconButton(
-//       onPressed: () {
-//         try{
-//           Requester().laterDeleteRequester(video.id);
-//         }catch(error){
-//         }
-//       },
-//       icon: const Icon(Icons.delete),
-//     );
-//   }
-
-//   Widget? trailing;
-// }
 
 class LaterVideoListTile extends VideoListTile {
   final video;

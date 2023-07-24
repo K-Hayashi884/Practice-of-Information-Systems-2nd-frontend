@@ -35,11 +35,6 @@ class VideoListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    Future<void> _setIndex() async {
-      VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context,listen: false);
-      videoNotifier.setIndex(video.id);
-    }
-
     VideoNotifier videoNotifier = Provider.of<VideoNotifier>(context);
     return ListTile(
       leading: SizedBox(height: 120, child: Image.network(video.imageUrl)),
@@ -50,8 +45,7 @@ class VideoListTile extends StatelessWidget {
       onTap: () {
         debugPrint(video.indices.toString());
         if(video.indices == null){
-           _setIndex();
-          //videoNotifier.setIndex(video.id);
+          videoNotifier.setIndex(video.id);
           debugPrint("complete set index");
         }
         Navigator.pushNamed(context, "index", arguments: video);

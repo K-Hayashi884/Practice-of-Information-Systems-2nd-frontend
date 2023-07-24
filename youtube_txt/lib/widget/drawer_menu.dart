@@ -13,7 +13,7 @@ class DrawerMenu extends StatelessWidget {
             title: TextButton(
               child: const Text("トップ"),
               onPressed: () {
-                Navigator.pushReplacementNamed(context, "top");
+                Navigator.of(context).pushNamedAndRemoveUntil("top", (_) => false);
               },
             ),
           ),
@@ -21,7 +21,7 @@ class DrawerMenu extends StatelessWidget {
             title: TextButton(
               child: const Text("あとで見る"),
               onPressed: () {
-                Navigator.pushReplacementNamed(context, "later");
+                Navigator.of(context).pushNamedAndRemoveUntil("later", (_) => false);
               },
             ),
           ),

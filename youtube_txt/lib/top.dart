@@ -19,8 +19,6 @@ class _TopPageState extends State<TopPage> {
   @override
   void initState() {
     super.initState();
-    VideoNotifier videoNotifier =
-        Provider.of<VideoNotifier>(context, listen: false);
     _fetchDataFromEndpoint(); // 初期データの取得
   }
 
